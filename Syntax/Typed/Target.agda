@@ -2,6 +2,7 @@ module Syntax.Typed.Target where
 
 open import Syntax.Raw
 open import Syntax.Typed.Typed
+open import Syntax.Evaluation
 
 infix 4 _⊢_∶_
 _⊢_∶_ : Ctxtₗ → Term → Ty → Set
@@ -18,8 +19,8 @@ mutual
     ∼trans : ∀{Γ t s w A} → Γ ⊢ t ∼ s ∶ A → Γ ⊢ s ∼ w ∶ A → Γ ⊢ t ∼ w ∶ A
 
     -- Substitution
-    ∼sub   : ∀{Θ Δ A t σ τ} → Δ ∷ ◇ ⊢ t ∶ A → Θ ⊢ₛ σ ∼ τ ∶ Δ
-           → Θ ⊢ msub t σ ∼ msub t τ ∶ A
+    ∼sub   : ∀{Γ A B t a b} → Γ # A ⊢ t ∶ B → Γ ⊢ a ∼ b ∶ A
+           → Γ ⊢ t ⟨ clen Γ ↦ a ⟩ ∼ t ⟨ clen Γ ↦ b ⟩ ∶ B
 
     -- Computation rules
     ∼β : ∀{Γ A B t s}
@@ -31,10 +32,3 @@ mutual
     ∼recS : ∀{Γ A z s n}
           → Γ ⊢ z ∶ A → Γ ⊢ s ∶ N => A => A → Γ ⊢ n ∶ N
           → Γ ⊢ Rec z s (Succ n) ∼ s · n · Rec z s n ∶ A
-
-  infix 4 _⊢ₛ_∼_∶_
-  data _⊢ₛ_∼_∶_ : Ctxtₗ → MetaSubst → MetaSubst → Ctxtₗ → Set where
-
-    ∼empty : ∀{Θ} → Θ ⊢ₛ ⟨⟩ ∼ ⟨⟩ ∶ ◇
-    ∼cons  : ∀{Θ Δ A t s σ τ} → Θ ⊢ₛ σ ∼ τ ∶ Δ → Θ ⊢ t ∼ s ∶ A
-           → Θ ⊢ₛ σ , t ∼ τ , s ∶ Δ # A

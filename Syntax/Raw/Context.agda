@@ -75,3 +75,8 @@ cut-lemma : ∀{A} → ∀ Γ Δ n → Γ ++ Δ [ n ]↦ A → clen Δ > n → �
 cut-lemma Γ ◇ n x ()
 cut-lemma Γ (Δ # x₁) .0 here p = here
 cut-lemma Γ (Δ # x₁) .(suc _) (there x) (s≤s p) = there (cut-lemma Γ Δ _ x p)
+
+l-maps-here : ∀{Θ A B} → Θ # A [ clen Θ ]ₗ↦ B → A ≡ B
+l-maps-here here = refl
+l-maps-here (there x) = ⊥-elim (≡lenLemma x refl)
+

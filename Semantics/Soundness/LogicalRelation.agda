@@ -26,7 +26,6 @@ data FunRel (A B : Ty) (RA RB : LogRel) (Θ : Ctxtₗ) (Γ : Ctxt)
              → RA Θ Δ s a
              → d [ Id · w , a ]↘ b
              → RB Θ Δ (sub t' (Id · w , s)) b)
-           -- → RB Θ (Γ # A) t' d
            → FunRel A B RA RB Θ Γ t (Lam d)
   =>-®-Ne  : ∀{t e} → Ne e
            → (Θ ∷ Γ ⊢ t ∼ e ∶ A => B)

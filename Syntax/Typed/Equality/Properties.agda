@@ -33,55 +33,55 @@ open import Syntax.Typed.Equality.Equality
 
 mutual
 
-  sameTm⟶LR : ∀{Θ Γ Δ A t s}
-              → Θ ∷ Δ ++ Γ ⊢ t ⟶ s ∶ A → Tm (clen Γ) t → Tm (clen Γ) s
-  sameTm⟶LR {_} {Γ} (⟶β x x₁) (tmApp (tmLam tm) tm₁) =
+  sameSz⟶LR : ∀{Θ Γ Δ A t s}
+              → Θ ∷ Δ ++ Γ ⊢ t ⟶ s ∶ A → Sz (clen Γ) t → Sz (clen Γ) s
+  sameSz⟶LR {_} {Γ} (⟶β x x₁) (tmApp (tmLam tm) tm₁) =
     sub-cover-lemma (clen Γ) 0 tm tm₁
-  sameTm⟶LR (⟶recZ x x₁) (tmRec tm tm₁ tm₂) = tm
-  sameTm⟶LR (⟶recS x x₁ x₂) (tmRec tm tm₁ (tmSucc tm₂)) =
+  sameSz⟶LR (⟶recZ x x₁) (tmRec tm tm₁ tm₂) = tm
+  sameSz⟶LR (⟶recS x x₁ x₂) (tmRec tm tm₁ (tmSucc tm₂)) =
     tmApp (tmApp tm₁ tm₂) (tmRec tm tm₁ tm₂)
-  sameTm⟶LR (⟶ξ eq) (tmLam tm) = tmLam (sameTm⟶LR eq tm)
-  sameTm⟶LR (⟶compSucc eq) (tmSucc tm) = tmSucc (sameTm⟶LR eq tm)
+  sameSz⟶LR (⟶ξ eq) (tmLam tm) = tmLam (sameSz⟶LR eq tm)
+  sameSz⟶LR (⟶compSucc eq) (tmSucc tm) = tmSucc (sameSz⟶LR eq tm)
 
-  sameTm⟶LR (⟶compApp₁ red x) (tmApp tm tm₁) = tmApp (sameTm⟶LR red tm) tm₁
-  sameTm⟶LR (⟶compApp₂ x red) (tmApp tm tm₁) = tmApp tm (sameTm⟶LR red tm₁)
-  sameTm⟶LR (⟶compRec₁ red _ _) (tmRec tm tm₁ tm₂) =
-    tmRec (sameTm⟶LR red tm) tm₁ tm₂
-  sameTm⟶LR (⟶compRec₂ _ red _) (tmRec tm tm₁ tm₂) =
-    tmRec tm (sameTm⟶LR red tm₁) tm₂
-  sameTm⟶LR (⟶compRec₃ _ _ red) (tmRec tm tm₁ tm₂) =
-    tmRec tm tm₁ (sameTm⟶LR red tm₂)
+  sameSz⟶LR (⟶compApp₁ red x) (tmApp tm tm₁) = tmApp (sameSz⟶LR red tm) tm₁
+  sameSz⟶LR (⟶compApp₂ x red) (tmApp tm tm₁) = tmApp tm (sameSz⟶LR red tm₁)
+  sameSz⟶LR (⟶compRec₁ red _ _) (tmRec tm tm₁ tm₂) =
+    tmRec (sameSz⟶LR red tm) tm₁ tm₂
+  sameSz⟶LR (⟶compRec₂ _ red _) (tmRec tm tm₁ tm₂) =
+    tmRec tm (sameSz⟶LR red tm₁) tm₂
+  sameSz⟶LR (⟶compRec₃ _ _ red) (tmRec tm tm₁ tm₂) =
+    tmRec tm tm₁ (sameSz⟶LR red tm₂)
 
-  sameTm⟶RL : ∀{Θ Γ Δ A t s}
-              → Θ ∷ Δ ++ Γ ⊢ t ⟶ s ∶ A → Tm (clen Γ) s → Tm (clen Γ) t
-  sameTm⟶RL (⟶β x x₁) tm = liftTm _ (tmApp (tmLam (tyClosed x)) (tyClosed x₁))
-  sameTm⟶RL (⟶recZ x x₁) tm = liftTm _ (tmRec (tyClosed x) (tyClosed x₁) tmZero)
-  sameTm⟶RL (⟶recS x x₁ x₂) (tmApp tm (tmRec tm₁ tm₂ tm₃)) =
+  sameSz⟶RL : ∀{Θ Γ Δ A t s}
+              → Θ ∷ Δ ++ Γ ⊢ t ⟶ s ∶ A → Sz (clen Γ) s → Sz (clen Γ) t
+  sameSz⟶RL (⟶β x x₁) tm = liftSz _ (tmApp (tmLam (tyClosed x)) (tyClosed x₁))
+  sameSz⟶RL (⟶recZ x x₁) tm = liftSz _ (tmRec (tyClosed x) (tyClosed x₁) tmZero)
+  sameSz⟶RL (⟶recS x x₁ x₂) (tmApp tm (tmRec tm₁ tm₂ tm₃)) =
     tmRec tm₁ tm₂ (tmSucc tm₃)
-  sameTm⟶RL (⟶ξ eq) (tmLam tm) = tmLam (sameTm⟶RL eq tm)
-  sameTm⟶RL (⟶compSucc eq) (tmSucc tm) = tmSucc (sameTm⟶RL eq tm)
-  sameTm⟶RL (⟶compApp₁ red x) (tmApp tm tm₁) = tmApp (sameTm⟶RL red tm) tm₁
-  sameTm⟶RL (⟶compApp₂ x red) (tmApp tm tm₁) = tmApp tm (sameTm⟶RL red tm₁)
-  sameTm⟶RL (⟶compRec₁ red x x₁) (tmRec tm tm₁ tm₂) =
-    tmRec (sameTm⟶RL red tm) tm₁ tm₂
-  sameTm⟶RL (⟶compRec₂ x red x₁) (tmRec tm tm₁ tm₂) =
-    tmRec tm (sameTm⟶RL red tm₁) tm₂
-  sameTm⟶RL (⟶compRec₃ x x₁ red) (tmRec tm tm₁ tm₂) =
-    tmRec tm tm₁ (sameTm⟶RL red tm₂)
+  sameSz⟶RL (⟶ξ eq) (tmLam tm) = tmLam (sameSz⟶RL eq tm)
+  sameSz⟶RL (⟶compSucc eq) (tmSucc tm) = tmSucc (sameSz⟶RL eq tm)
+  sameSz⟶RL (⟶compApp₁ red x) (tmApp tm tm₁) = tmApp (sameSz⟶RL red tm) tm₁
+  sameSz⟶RL (⟶compApp₂ x red) (tmApp tm tm₁) = tmApp tm (sameSz⟶RL red tm₁)
+  sameSz⟶RL (⟶compRec₁ red x x₁) (tmRec tm tm₁ tm₂) =
+    tmRec (sameSz⟶RL red tm) tm₁ tm₂
+  sameSz⟶RL (⟶compRec₂ x red x₁) (tmRec tm tm₁ tm₂) =
+    tmRec tm (sameSz⟶RL red tm₁) tm₂
+  sameSz⟶RL (⟶compRec₃ x x₁ red) (tmRec tm tm₁ tm₂) =
+    tmRec tm tm₁ (sameSz⟶RL red tm₂)
 
-  sameTm∼LR : ∀{Θ Γ Δ A t s}
-            → Θ ∷ Δ ++ Γ ⊢ t ∼ s ∶ A → Tm (clen Γ) t → Tm (clen Γ) s
-  sameTm∼LR (~⟶ x) tm = sameTm⟶LR x tm
-  sameTm∼LR (∼refl x) tm = tm
-  sameTm∼LR (∼symm eq) tm = sameTm∼RL eq tm
-  sameTm∼LR (∼trans eq eq₁) tm = sameTm∼LR eq₁ (sameTm∼LR eq tm)
+  sameSz∼LR : ∀{Θ Γ Δ A t s}
+            → Θ ∷ Δ ++ Γ ⊢ t ∼ s ∶ A → Sz (clen Γ) t → Sz (clen Γ) s
+  sameSz∼LR (~⟶ x) tm = sameSz⟶LR x tm
+  sameSz∼LR (∼refl x) tm = tm
+  sameSz∼LR (∼symm eq) tm = sameSz∼RL eq tm
+  sameSz∼LR (∼trans eq eq₁) tm = sameSz∼LR eq₁ (sameSz∼LR eq tm)
 
-  sameTm∼RL : ∀{Θ Γ Δ A t s}
-            → Θ ∷ Δ ++ Γ ⊢ t ∼ s ∶ A → Tm (clen Γ) s → Tm (clen Γ) t
-  sameTm∼RL (~⟶ x) tm = sameTm⟶RL x tm
-  sameTm∼RL (∼refl x) tm = tm
-  sameTm∼RL (∼symm eq) tm = sameTm∼LR eq tm
-  sameTm∼RL (∼trans eq eq₁) tm = sameTm∼RL eq (sameTm∼RL eq₁ tm)
+  sameSz∼RL : ∀{Θ Γ Δ A t s}
+            → Θ ∷ Δ ++ Γ ⊢ t ∼ s ∶ A → Sz (clen Γ) s → Sz (clen Γ) t
+  sameSz∼RL (~⟶ x) tm = sameSz⟶RL x tm
+  sameSz∼RL (∼refl x) tm = tm
+  sameSz∼RL (∼symm eq) tm = sameSz∼LR eq tm
+  sameSz∼RL (∼trans eq eq₁) tm = sameSz∼RL eq (sameSz∼RL eq₁ tm)
 
 ≡to∼R : ∀{Θ Γ A t s s'} → s ≡ s' → Θ ∷ Γ ⊢ t ∼ s ∶ A → Θ ∷ Γ ⊢ t ∼ s' ∶ A
 ≡to∼R refl eq = eq

@@ -9,11 +9,11 @@ open import Data.Product renaming (_,_ to _,,_)
 open import Data.Sum renaming ([_,_] to [[_,,_]])
 
 data β-Redex : Term → Term → Set where
-  βrdx : ∀{t s} → Tm 1 t → Tm 0 s → β-Redex (Lam t) s
+  βrdx : ∀{t s} → Sz 1 t → Sz 0 s → β-Redex (Lam t) s
 
 data N-Redex : Term → Term → Term → Set where
-  NrdxZ : ∀{z s} → Tm 0 z → Tm 0 s → N-Redex z s Zero
-  NrdxS : ∀{z s n} → Tm 0 z → Tm 0 s → Tm 0 n → N-Redex z s (Succ n)
+  NrdxZ : ∀{z s} → Sz 0 z → Sz 0 s → N-Redex z s Zero
+  NrdxS : ∀{z s n} → Sz 0 z → Sz 0 s → Sz 0 n → N-Redex z s (Succ n)
 
 mutual
   infix 4 _●_↘_
@@ -54,22 +54,22 @@ mutual
 
 NeApp¬β : ∀{t s} → Ne (t · s) → β-Redex t s → ⊥
 NeApp¬β (neApp () x x₁ x₂) (βrdx x₃ x₄)
-NeApp¬β (neApp₁ x x₁ x₂) (βrdx x₃ x₄) = ¬Tm-lemma x₂ (tmLam x₃)
-NeApp¬β (neApp₂ x x₁ x₂ x₃) (βrdx x₄ x₅) = ¬Tm-lemma x₃ x₅
+NeApp¬β (neApp₁ x x₁ x₂) (βrdx x₃ x₄) = ¬Sz-lemma x₂ (tmLam x₃)
+NeApp¬β (neApp₂ x x₁ x₂ x₃) (βrdx x₄ x₅) = ¬Sz-lemma x₃ x₅
 
 NeRec¬N : ∀{z s n} → Ne (Rec z s n) → N-Redex z s n → ⊥
 NeRec¬N (neRec x x₁ () x₂ x₃ x₄) (NrdxZ x₅ x₆)
 NeRec¬N (neRec x x₁ () x₂ x₃ x₄) (NrdxS x₅ x₆ x₇)
-NeRec¬N (neRec₁ x x₁ x₂ x₃) (NrdxZ x₄ x₅) = ¬Tm-lemma x₃ x₄
-NeRec¬N (neRec₁ x x₁ x₂ x₃) (NrdxS x₄ x₅ x₆) = ¬Tm-lemma x₃ x₄
-NeRec¬N (neRec₂ x x₁ x₂ x₃ x₄) (NrdxZ x₅ x₆) = ¬Tm-lemma x₄ x₆
-NeRec¬N (neRec₂ x x₁ x₂ x₃ x₄) (NrdxS x₅ x₆ x₇) = ¬Tm-lemma x₄ x₆
+NeRec¬N (neRec₁ x x₁ x₂ x₃) (NrdxZ x₄ x₅) = ¬Sz-lemma x₃ x₄
+NeRec¬N (neRec₁ x x₁ x₂ x₃) (NrdxS x₄ x₅ x₆) = ¬Sz-lemma x₃ x₄
+NeRec¬N (neRec₂ x x₁ x₂ x₃ x₄) (NrdxZ x₅ x₆) = ¬Sz-lemma x₄ x₆
+NeRec¬N (neRec₂ x x₁ x₂ x₃ x₄) (NrdxS x₅ x₆ x₇) = ¬Sz-lemma x₄ x₆
 NeRec¬N (neRec₃ x x₁ x₂ x₃ x₄ ()) (NrdxZ x₆ x₇)
-NeRec¬N (neRec₃ x x₁ x₂ x₃ x₄ (¬tmSucc x₅)) (NrdxS x₆ x₇ x₈) = ¬Tm-lemma x₅ x₈
+NeRec¬N (neRec₃ x x₁ x₂ x₃ x₄ (¬tmSucc x₅)) (NrdxS x₆ x₇ x₈) = ¬Sz-lemma x₅ x₈
 
 decβ-Redex : ∀{t s} → Nf (Lam t) → Nf s
            → β-Redex (Lam t) s ⊎ Ne (Lam t · s)
-decβ-Redex {t} {s} nfl nfs with decTm 1 t | decTm 0 s
+decβ-Redex {t} {s} nfl nfs with decSz 1 t | decSz 0 s
 decβ-Redex {t} {s} nfl nfs | inj₁ x | inj₁ x₁ = inj₁ (βrdx x x₁)
 decβ-Redex {t} {s} nfl nfs | inj₁ x | inj₂ y = inj₂ (neApp₂ nfl nfs (tmLam x) y)
 decβ-Redex {t} {s} nfl nfs | inj₂ y | _ = inj₂ (neApp₁ nfl nfs (¬tmLam y))
@@ -88,33 +88,33 @@ decβ-Redex' et es (inj₁ (_ ,, p)) rewrite p =
   [[ (λ x → inj₁ (x ,, (_ ,, refl))) ,, (λ x → inj₂ x) ]] (decβ-Redex et es)
 decβ-Redex' et es (inj₂ y) = inj₂ (inj-neApp y es)
 
-β-Redex-Tm-t : ∀{t s} → β-Redex t s → Tm 0 t
-β-Redex-Tm-t (βrdx x _) = tmLam x
+β-Redex-Sz-t : ∀{t s} → β-Redex t s → Sz 0 t
+β-Redex-Sz-t (βrdx x _) = tmLam x
 
-β-Redex-Tm-Lam-t : ∀{t s} → β-Redex (Lam t) s → Tm 1 t
-β-Redex-Tm-Lam-t (βrdx x _) = x
+β-Redex-Sz-Lam-t : ∀{t s} → β-Redex (Lam t) s → Sz 1 t
+β-Redex-Sz-Lam-t (βrdx x _) = x
 
-β-Redex-Tm-s : ∀{t s} → β-Redex t s → Tm 0 s
-β-Redex-Tm-s (βrdx x x₁) = x₁
+β-Redex-Sz-s : ∀{t s} → β-Redex t s → Sz 0 s
+β-Redex-Sz-s (βrdx x x₁) = x₁
 
 Lam-inj : ∀{t t'} → Lam t ≡ Lam t' → t ≡ t'
 Lam-inj refl = refl
 
-N-Redex-Tm : ∀{z s t} → N-Redex z s t → Tm 0 (Rec z s t)
-N-Redex-Tm (NrdxZ x x₁) = tmRec x x₁ tmZero
-N-Redex-Tm (NrdxS x x₁ x₂) = tmRec x x₁ (tmSucc x₂)
+N-Redex-Sz : ∀{z s t} → N-Redex z s t → Sz 0 (Rec z s t)
+N-Redex-Sz (NrdxZ x x₁) = tmRec x x₁ tmZero
+N-Redex-Sz (NrdxS x x₁ x₂) = tmRec x x₁ (tmSucc x₂)
 
-N-Redex-Tm-z : ∀{z s t} → N-Redex z s t → Tm 0 z
-N-Redex-Tm-z (NrdxZ x₁ x₂) = x₁
-N-Redex-Tm-z (NrdxS x₁ x₂ x₃) = x₁
+N-Redex-Sz-z : ∀{z s t} → N-Redex z s t → Sz 0 z
+N-Redex-Sz-z (NrdxZ x₁ x₂) = x₁
+N-Redex-Sz-z (NrdxS x₁ x₂ x₃) = x₁
 
-N-Redex-Tm-s : ∀{z s t} → N-Redex z s t → Tm 0 s
-N-Redex-Tm-s (NrdxZ x₁ x₂) = x₂
-N-Redex-Tm-s (NrdxS x₁ x₂ x₃) = x₂
+N-Redex-Sz-s : ∀{z s t} → N-Redex z s t → Sz 0 s
+N-Redex-Sz-s (NrdxZ x₁ x₂) = x₂
+N-Redex-Sz-s (NrdxS x₁ x₂ x₃) = x₂
 
-N-Redex-Tm-t : ∀{z s t} → N-Redex z s t → Tm 0 t
-N-Redex-Tm-t (NrdxZ x₁ x₂) = tmZero
-N-Redex-Tm-t (NrdxS x₁ x₂ x₃) = tmSucc x₃
+N-Redex-Sz-t : ∀{z s t} → N-Redex z s t → Sz 0 t
+N-Redex-Sz-t (NrdxZ x₁ x₂) = tmZero
+N-Redex-Sz-t (NrdxS x₁ x₂ x₃) = tmSucc x₃
 
 NeZeroLemma : ∀{t σ} → Nf t → Eval sub t σ ↘ Zero
             → t ≡ Zero ⊎ Ne t
@@ -142,7 +142,7 @@ NOpIsNf (nroNe x) = nfNe x
 
 decN-Redex : ∀{z s t} → Nf z → Nf s → N-Redex-Op t
            → N-Redex z s t ⊎ Ne (Rec z s t)
-decN-Redex {z} {s} {t} nfz nfs nt with decTm 0 z | decTm 0 s | decTm 0 t
+decN-Redex {z} {s} {t} nfz nfs nt with decSz 0 z | decSz 0 s | decSz 0 t
 decN-Redex nfz nfs nroZ | inj₁ x | inj₁ x₁ | inj₁ x₂ = inj₁ (NrdxZ x x₁)
 decN-Redex nfz nfs (nroS x₃) | inj₁ x | inj₁ x₁ | inj₁ x₂ =
   inj₁ (NrdxS x x₁ (tmSuccLemma x₂))

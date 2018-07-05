@@ -37,10 +37,10 @@ mutual
   ifNe (neApp () _ _ _) (_ ,, ⟶ᶜʰβ _)
   ifNe (neApp ne _ _ _) (_ ,, ⟶ᶜʰ·₁ r) = ifNe ne (_ ,, r)
   ifNe (neApp ne x x₁ x₂) (_ ,, ⟶ᶜʰ·₂ r) = ifNf x (_ ,, r)
-  ifNe (neApp₁ x x₁ x₂) (_ ,, ⟶ᶜʰβ (βrdx x₃ x₄)) = ¬Tm-lemma x₂ (tmLam x₃)
+  ifNe (neApp₁ x x₁ x₂) (_ ,, ⟶ᶜʰβ (βrdx x₃ x₄)) = ¬Sz-lemma x₂ (tmLam x₃)
   ifNe (neApp₁ x x₁ x₂) (_ ,, ⟶ᶜʰ·₁ r) = ifNf x (_ ,, r)
   ifNe (neApp₁ x x₁ x₂) (_ ,, ⟶ᶜʰ·₂ r) = ifNf x₁ (_ ,, r)
-  ifNe (neApp₂ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰβ (βrdx x₄ x₅)) = ¬Tm-lemma x₃ x₅
+  ifNe (neApp₂ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰβ (βrdx x₄ x₅)) = ¬Sz-lemma x₃ x₅
   ifNe (neApp₂ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰ·₁ r) = ifNf x (_ ,, r)
   ifNe (neApp₂ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰ·₂ r) = ifNf x₁ (_ ,, r)
   ifNe (neRec x x₁ () x₂ x₃ x₄) (_ ,, ⟶ᶜʰRZ (NrdxZ x₅ x₆))
@@ -48,19 +48,19 @@ mutual
   ifNe (neRec x x₁ ne x₂ x₃ x₄) (_ ,, ⟶ᶜʰR₁ r) = ifNf x (_ ,, r)
   ifNe (neRec x x₁ ne x₂ x₃ x₄) (_ ,, ⟶ᶜʰR₂ r) = ifNf x₁ (_ ,, r)
   ifNe (neRec x x₁ ne x₂ x₃ x₄) (_ ,, ⟶ᶜʰR₃ r) = ifNe ne (_ ,, r)
-  ifNe (neRec₁ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰRZ (NrdxZ x₄ x₅)) = ¬Tm-lemma x₃ x₄
-  ifNe (neRec₁ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰRS (NrdxS x₄ x₅ x₆)) = ¬Tm-lemma x₃ x₄
+  ifNe (neRec₁ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰRZ (NrdxZ x₄ x₅)) = ¬Sz-lemma x₃ x₄
+  ifNe (neRec₁ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰRS (NrdxS x₄ x₅ x₆)) = ¬Sz-lemma x₃ x₄
   ifNe (neRec₁ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰR₁ r) = ifNf x (_ ,, r)
   ifNe (neRec₁ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰR₂ r) = ifNf x₁ (_ ,, r)
   ifNe (neRec₁ x x₁ x₂ x₃) (_ ,, ⟶ᶜʰR₃ r) = ifNf x₂ (_ ,, r)
-  ifNe (neRec₂ x x₁ nfZero x₃ x₄) (_ ,, ⟶ᶜʰRZ (NrdxZ x₂ x₅)) = ¬Tm-lemma x₄ x₅
+  ifNe (neRec₂ x x₁ nfZero x₃ x₄) (_ ,, ⟶ᶜʰRZ (NrdxZ x₂ x₅)) = ¬Sz-lemma x₄ x₅
   ifNe (neRec₂ x x₁ (nfNe ()) x₃ x₄) (_ ,, ⟶ᶜʰRZ x₅)
-  ifNe (neRec₂ x x₁ x₂ x₃ x₄) (_ ,, ⟶ᶜʰRS (NrdxS x₅ x₆ x₇)) = ¬Tm-lemma x₄ x₆
+  ifNe (neRec₂ x x₁ x₂ x₃ x₄) (_ ,, ⟶ᶜʰRS (NrdxS x₅ x₆ x₇)) = ¬Sz-lemma x₄ x₆
   ifNe (neRec₂ x x₁ x₂ x₃ x₄) (_ ,, ⟶ᶜʰR₁ r) = ifNf x (_ ,, r)
   ifNe (neRec₂ x x₁ x₂ x₃ x₄) (_ ,, ⟶ᶜʰR₂ r) = ifNf x₁ (_ ,, r)
   ifNe (neRec₂ x x₁ x₂ x₃ x₄) (_ ,, ⟶ᶜʰR₃ r) = ifNf x₂ (_ ,, r)
   ifNe (neRec₃ x x₁ x₂ x₃ x₄ ()) (_ ,, ⟶ᶜʰRZ x₆)
-  ifNe (neRec₃ x x₁ x₂ x₃ x₄ (¬tmSucc x₅)) (_ ,, ⟶ᶜʰRS (NrdxS x₆ x₇ x₈)) = ¬Tm-lemma x₅ x₈
+  ifNe (neRec₃ x x₁ x₂ x₃ x₄ (¬tmSucc x₅)) (_ ,, ⟶ᶜʰRS (NrdxS x₆ x₇ x₈)) = ¬Sz-lemma x₅ x₈
   ifNe (neRec₃ x x₁ x₂ x₃ x₄ x₅) (_ ,, ⟶ᶜʰR₁ r) = ifNf x (_ ,, r)
   ifNe (neRec₃ x x₁ x₂ x₃ x₄ x₅) (_ ,, ⟶ᶜʰR₂ r) = ifNf x₁ (_ ,, r)
   ifNe (neRec₃ x x₁ x₂ x₃ x₄ x₅) (_ ,, ⟶ᶜʰR₃ r) = ifNf x₂ (_ ,, r)

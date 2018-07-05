@@ -32,8 +32,8 @@ open SubComp
       record { ev1 = eApp (ev1 ih) (ev1 ih') (≡App (sym p)
                           refl refl (●β brdx evl)) ; ev2 = evlb }
       where
-        e1 = ≡Eval (null-sub (β-Redex-Tm-t q)) refl (ev2 ih)
-        e2 = ≡Eval (null-sub (β-Redex-Tm-s q)) refl (ev2 ih')
+        e1 = ≡Eval (null-sub (β-Redex-Sz-t q)) refl (ev2 ih)
+        e2 = ≡Eval (null-sub (β-Redex-Sz-s q)) refl (ev2 ih')
         lam-eq = trans (sym p) (Eval-fun (nfSelf (nfEval (ev1 ih))) e1)
         ss-eq = Eval-fun (nfSelf (nfEval (ev1 ih'))) e2
         brdx : β-Redex (Lam tee) (tm ih')
@@ -42,8 +42,8 @@ open SubComp
         evl = ≡Eval (cong₂ sub (sym (Lam-inj lam-eq))
           (cong₂ _,_ refl (sym ss-eq))) refl ev
         evlb : Eval sub b σ ↘ b
-        evlb = ≡Eval (sym (null-sub (Eval-Tm (sub-cover-lemma 0 0
-          (β-Redex-Tm-Lam-t rdx) (β-Redex-Tm-s rdx)) ev)))
+        evlb = ≡Eval (sym (null-sub (Eval-Sz (sub-cover-lemma 0 0
+          (β-Redex-Sz-Lam-t rdx) (β-Redex-Sz-s rdx)) ev)))
             refl (nfSelf (nfEval ev))
     goal | inj₂ y =
       record { ev1 = eApp (ev1 ih) (ev1 ih') (●Ne y)
@@ -68,12 +68,12 @@ rec-sub-swap {z} {s = s} {t = t} {σ} ihz ihs iht r@(rZ x) = goal
     goal | inj₁ (q ,, x) =
       record { ev1 = eRec (ev1 ihz) (ev1 ihs) (ev1 iht)
                           (≡Rec refl refl (sym x) refl (rZ rdxx))
-             ; ev2 = ≡Eval (sym (trans (null-sub (N-Redex-Tm-z q)) eqq))
+             ; ev2 = ≡Eval (sym (trans (null-sub (N-Redex-Sz-z q)) eqq))
                        refl (nfSelf (nfEval (ev2 ihz))) }
       where
-        rdxx = NrdxZ (N-Redex-Tm-z q) (N-Redex-Tm-s q)
+        rdxx = NrdxZ (N-Redex-Sz-z q) (N-Redex-Sz-s q)
         eqq = Eval-fun (nfSelf (nfEval (ev1 ihz)))
-                (≡Eval (null-sub (N-Redex-Tm-z q)) refl (ev2 ihz))
+                (≡Eval (null-sub (N-Redex-Sz-z q)) refl (ev2 ihz))
     goal | inj₂ y =
       record { ev1 = eRec (ev1 ihz) (ev1 ihs) (ev1 iht) (rNe y)
              ; ev2 = eRec (ev2 ihz) (ev2 ihs) (ev2 iht) r }
@@ -89,22 +89,22 @@ rec-sub-swap {z} {s = s} {t = t} {b = b} {σ} ihz ihs iht r@(rS x rk x₂ x₃) 
                           (≡Rec refl refl (sym x) refl rekk)
              ; ev2 = ssbb }
       where
-        e2 = ≡Eval (null-sub (N-Redex-Tm-z q)) refl (ev2 ihz)
-        e3 = ≡Eval (null-sub (N-Redex-Tm-s q)) refl (ev2 ihs)
-        e4 = ≡Eval (null-sub (N-Redex-Tm-t q)) refl (ev2 iht)
+        e2 = ≡Eval (null-sub (N-Redex-Sz-z q)) refl (ev2 ihz)
+        e3 = ≡Eval (null-sub (N-Redex-Sz-s q)) refl (ev2 ihs)
+        e4 = ≡Eval (null-sub (N-Redex-Sz-t q)) refl (ev2 iht)
         eq2 = Eval-fun (nfSelf (nfEval (ev1 ihz))) e2
         eq3 = Eval-fun (nfSelf (nfEval (ev1 ihs))) e3
         eq4 = Eval-fun (nfSelf (nfEval (ev1 iht))) e4
         rdx : N-Redex (tm ihz) (tm ihs) (Succ tee)
-        rdx = NrdxS (N-Redex-Tm-z q) (N-Redex-Tm-s q)
-                    (tmSuccLemma (Tm≡ x refl (N-Redex-Tm-t q)))
+        rdx = NrdxS (N-Redex-Sz-z q) (N-Redex-Sz-s q)
+                    (tmSuccLemma (Sz≡ x refl (N-Redex-Sz-t q)))
         rekk =
           rS rdx (≡Rec (sym eq2) (sym eq3)
                  (Succ-inj (trans (sym eq4) x)) refl rk)
                  (≡App (sym eq3) (Succ-inj (trans (sym eq4) x)) refl x₂) x₃
-        b0 = rec-Tm (Tm≡ eq2 refl (N-Redex-Tm-z q))
-                    (Tm≡ eq3 refl (N-Redex-Tm-s q))
-                    (Tm≡ eq4 refl (N-Redex-Tm-t q)) r
+        b0 = rec-Sz (Sz≡ eq2 refl (N-Redex-Sz-z q))
+                    (Sz≡ eq3 refl (N-Redex-Sz-s q))
+                    (Sz≡ eq4 refl (N-Redex-Sz-t q)) r
         ssbb = ≡Eval (sym (null-sub b0)) refl
             (nfSelf (nfRec (nfEval (ev2 ihz)) (nfEval (ev2 ihs)) (nfEval (ev2 iht)) r))
     goal | inj₂ y =
@@ -161,13 +161,13 @@ rec-sub-swap' nfz nfs nft ez es et r |
         | Eval-fun (nfSelf nfs) ev4
         | Eval-fun (nfSelf nft) ev5 = _ ,, (x ,, ev2)
 
-Rec-Tm' : ∀{z z' s s' t t'}
+Rec-Sz' : ∀{z z' s s' t t'}
         → Eval z ↘ z' → Eval s ↘ s' → Eval t ↘ t'
-        → N-Redex z' s' t' → Tm 0 (Rec z s t)
-Rec-Tm' ez es et rdx =
-  tmRec (Eval-Tm' ez (N-Redex-Tm-z rdx))
-        (Eval-Tm' es (N-Redex-Tm-s rdx))
-        (Eval-Tm' et (N-Redex-Tm-t rdx))
+        → N-Redex z' s' t' → Sz 0 (Rec z s t)
+Rec-Sz' ez es et rdx =
+  tmRec (Eval-Sz' ez (N-Redex-Sz-z rdx))
+        (Eval-Sz' es (N-Redex-Sz-s rdx))
+        (Eval-Sz' et (N-Redex-Sz-t rdx))
 
 sub-unswap : ∀{t a b σ} → Eval t ↘ a → Eval sub a σ ↘ b → Eval sub t σ ↘ b
 sub-unswap eBound e2 = e2
@@ -176,21 +176,21 @@ sub-unswap eZero e2 = e2
 sub-unswap (eSucc e1) (eSucc e2) = eSucc (sub-unswap e1 e2)
 sub-unswap (eLam e1) (eLam e2) = eLam (sub-unswap e1 e2)
 sub-unswap e@(eApp e1 e3 ap@(●β (βrdx x x₂) x₁)) e2 =
-  ≡Eval (sym (null-sub (tmApp (Eval-Tm' e1 (tmLam x)) (Eval-Tm' e3 x₂))))
-    (Eval-fun (≡Eval (sym (null-sub (Eval-Tm
+  ≡Eval (sym (null-sub (tmApp (Eval-Sz' e1 (tmLam x)) (Eval-Sz' e3 x₂))))
+    (Eval-fun (≡Eval (sym (null-sub (Eval-Sz
       (sub-cover-lemma 0 0 x x₂) x₁))) refl (nfSelf (nfEval x₁))) e2) e
 sub-unswap (eApp e1 e3 (●Ne x)) (eApp e2 e4 x₁) =
   eApp (sub-unswap e1 e2) (sub-unswap e3 e4) x₁
 sub-unswap e@(eRec e1 e3 e4 (rZ x)) e2 =
   ≡Eval (sym (null-sub tmm))
-        (Eval-fun (≡Eval (sym (null-sub (Eval-Tm tmm e)))
+        (Eval-fun (≡Eval (sym (null-sub (Eval-Sz tmm e)))
           refl (nfSelf (nfEval e))) e2) e
-  where tmm = Rec-Tm' e1 e3 e4 x
+  where tmm = Rec-Sz' e1 e3 e4 x
 sub-unswap e@(eRec e1 e3 e4 (rS x x₁ x₂ x₃)) e2 =
   ≡Eval (sym (null-sub tmm))
-    (Eval-fun (≡Eval (sym (null-sub (Eval-Tm tmm e)))
+    (Eval-fun (≡Eval (sym (null-sub (Eval-Sz tmm e)))
       refl (nfSelf (nfEval e))) e2) e
-  where tmm = Rec-Tm' e1 e3 e4 x
+  where tmm = Rec-Sz' e1 e3 e4 x
 sub-unswap (eRec e1 e3 e4 (rNe x)) (eRec e2 e5 e6 x₁) =
   eRec (sub-unswap e1 e2) (sub-unswap e3 e5) (sub-unswap e4 e6) x₁
 

@@ -40,7 +40,7 @@ null-wk-var zero .0 z≤n = refl
 null-wk-var (suc n) zero p = refl
 null-wk-var (suc n) (suc x) (s≤s p) = cong suc (null-wk-var n x p)
 
-null-wk : ∀ {n t w} → Tm n t → wk t (skip n w) ≡ t
+null-wk : ∀ {n t w} → Sz n t → wk t (skip n w) ≡ t
 null-wk tmFree = refl
 null-wk (tmVar x) = cong Bound (null-wk-var _ _ x)
 null-wk (tmLam tm) = cong Lam (null-wk tm)
@@ -161,12 +161,12 @@ wk-var≤ (suc k) m (suc x) zero ()
 wk-var≤ (suc k) m (suc x) (suc n) (s≤s p)
   rewrite plus-succ m n = s≤s (wk-var≤ k m x n p)
 
-tm-wk-lemma : ∀{t} n k m → Tm n t → Tm (m + n) (wk t (skip k (up m Id)))
+tm-wk-lemma : ∀{t} n k m → Sz n t → Sz (m + n) (wk t (skip k (up m Id)))
 tm-wk-lemma n k m tmFree = tmFree
 tm-wk-lemma .(suc _) k m (tmVar {n = n} x₁) rewrite plus-succ m n =
   tmVar (wk-var≤ k m _ n x₁)
 tm-wk-lemma n k m (tmLam tm₁) =
-  tmLam (Tm≡ refl (plus-succ m n) (tm-wk-lemma (suc n) (suc k) m tm₁))
+  tmLam (Sz≡ refl (plus-succ m n) (tm-wk-lemma (suc n) (suc k) m tm₁))
 tm-wk-lemma n k m (tmApp tm₁ tm₂) =
   tmApp (tm-wk-lemma n k m tm₁) (tm-wk-lemma n k m tm₂)
 tm-wk-lemma n k m (tmRec tm₁ tm₂ tm₃) =
@@ -174,8 +174,8 @@ tm-wk-lemma n k m (tmRec tm₁ tm₂ tm₃) =
 tm-wk-lemma n k m tmZero = tmZero
 tm-wk-lemma n k m (tmSucc tm) = tmSucc (tm-wk-lemma n k m tm)
 
-tm-wk-0 : ∀{t w} → Tm 0 t → Tm 0 (wk t w)
-tm-wk-0 {t} {w} tm = subst (Tm 0) (sym (null-wk tm)) tm
+tm-wk-0 : ∀{t w} → Sz 0 t → Sz 0 (wk t w)
+tm-wk-0 {t} {w} tm = subst (Sz 0) (sym (null-wk tm)) tm
 
 wk≤ : ∀ w x → x ≤ wk-var x w
 wk≤ Id x = ≤refl x
@@ -183,15 +183,15 @@ wk≤ (Up w) x = ≤succ (wk≤ w x)
 wk≤ (Skip w) zero = z≤n
 wk≤ (Skip w) (suc x) = s≤s (wk≤ w x)
 
-sub¬Tm-lemma : ∀{n w t} → ¬Tm n t → ¬Tm n (wk t w)
-sub¬Tm-lemma {w = w} (¬tmVar {x = x} p) = ¬tmVar (≤trans p (wk≤ w x))
-sub¬Tm-lemma (¬tmLam tm) = ¬tmLam (sub¬Tm-lemma tm)
-sub¬Tm-lemma (¬tmApp₁ tm) = ¬tmApp₁ (sub¬Tm-lemma tm)
-sub¬Tm-lemma (¬tmApp₂ x tm) = inj-tmApp₂ (sub¬Tm-lemma tm)
-sub¬Tm-lemma (¬tmSucc tm) = ¬tmSucc (sub¬Tm-lemma tm)
-sub¬Tm-lemma (¬tmRec₁ tm) = ¬tmRec₁ (sub¬Tm-lemma tm)
-sub¬Tm-lemma (¬tmRec₂ x tm) = inj-tmRec₂ (sub¬Tm-lemma tm)
-sub¬Tm-lemma (¬tmRec₃ x x₁ tm) = inj-tmRec₃ (sub¬Tm-lemma tm)
+sub¬Sz-lemma : ∀{n w t} → ¬Sz n t → ¬Sz n (wk t w)
+sub¬Sz-lemma {w = w} (¬tmVar {x = x} p) = ¬tmVar (≤trans p (wk≤ w x))
+sub¬Sz-lemma (¬tmLam tm) = ¬tmLam (sub¬Sz-lemma tm)
+sub¬Sz-lemma (¬tmApp₁ tm) = ¬tmApp₁ (sub¬Sz-lemma tm)
+sub¬Sz-lemma (¬tmApp₂ x tm) = inj-tmApp₂ (sub¬Sz-lemma tm)
+sub¬Sz-lemma (¬tmSucc tm) = ¬tmSucc (sub¬Sz-lemma tm)
+sub¬Sz-lemma (¬tmRec₁ tm) = ¬tmRec₁ (sub¬Sz-lemma tm)
+sub¬Sz-lemma (¬tmRec₂ x tm) = inj-tmRec₂ (sub¬Sz-lemma tm)
+sub¬Sz-lemma (¬tmRec₃ x x₁ tm) = inj-tmRec₃ (sub¬Sz-lemma tm)
 
 wk-var-ups : ∀ x m → wk-var x (up m Id) ≡ x + m
 wk-var-ups x zero = sym (plus-0 x)

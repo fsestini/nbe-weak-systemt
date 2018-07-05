@@ -89,13 +89,13 @@ tmRecLemma zh sh th =
            ∣ eRec (↘tm2 zh) (↘tm2 sh) (↘tm2 th) (↘rec rk) ⟩
   where rk = recLemma (∈tm zh) (∈tm sh) (∈tm th)
 
-Eval0 : ∀{n t d ρ} → Tm n t → Eval sub t (shift n ρ) ↘ d → Tm n d
-Eval0 {n} tm e = Eval-Tm (subst (Tm n) (sym (null-sub tm)) tm) e
+Eval0 : ∀{n t d ρ} → Sz n t → Eval sub t (shift n ρ) ↘ d → Sz n d
+Eval0 {n} tm e = Eval-Sz (subst (Sz n) (sym (null-sub tm)) tm) e
 
 tmRecZLemma : ∀{A z s ρ}
     → ⟦ z ⟧≃⟦ z ⟧ ρ ∈tm ⟦ A ⟧ₜ
     → ⟦ s ⟧≃⟦ s ⟧ ρ ∈tm ⟦ N => A => A ⟧ₜ
-    → Tm 0 z → Tm 0 s
+    → Sz 0 z → Sz 0 s
     → ⟦ Rec z s Zero ⟧≃⟦ z ⟧ ρ ∈tm ⟦ A ⟧ₜ
 tmRecZLemma zp sp tmz tms =
   ⟨ ∈tm zp
@@ -107,7 +107,7 @@ tmRecSLemma : ∀{A z s n ρ}
     → ⟦ z ⟧≃⟦ z ⟧ ρ ∈tm ⟦ A ⟧ₜ
     → ⟦ s ⟧≃⟦ s ⟧ ρ ∈tm ⟦ N => A => A ⟧ₜ
     → ⟦ n ⟧≃⟦ n ⟧ ρ ∈tm Nat
-    → Tm 0 z → Tm 0 s → Tm 0 n
+    → Sz 0 z → Sz 0 s → Sz 0 n
     → ⟦ Rec z s (Succ n) ⟧≃⟦ s · n · Rec z s n ⟧ ρ ∈tm ⟦ A ⟧ₜ
 tmRecSLemma {A = A} zp sp np tmz tms tmn
   with tmRecLemma {A} zp sp np
@@ -135,7 +135,7 @@ tmSubLemma {t} {ρ} {t'} {s} {s'} {d} e1 e3 sb =
 tmβLemma : ∀{A B t s ρ}
          → ⟦ Lam t ⟧≃⟦ Lam t ⟧ ρ ∈tm ⟦ A => B ⟧ₜ
          → ⟦ s ⟧≃⟦ s ⟧ ρ ∈tm ⟦ A ⟧ₜ
-         → Tm 1 t → Tm 0 s
+         → Sz 1 t → Sz 0 s
          → ⟦ Lam t · s ⟧≃⟦ sub t (Id , s) ⟧ ρ ∈tm ⟦ B ⟧ₜ
 tmβLemma {A} {B} l s tmt tms with tmAppLemma {A = A} {B = B} l s
 tmβLemma {t = t} l sp tmt tms 

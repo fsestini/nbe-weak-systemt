@@ -2,10 +2,10 @@ module Syntax.Typed.Correspondence where
 
 open import Syntax.Raw
 open import Syntax.Typed.Equality.Equality
+open import Syntax.Typed.Equality.Properties
 open import Syntax.Typed.Target
 open import Syntax.Typed.Typed
 open import Relation.Binary.PropositionalEquality hiding ([_])
-open import Syntax.Typed.MetaSubstitution
 
 --------------------------------------------------------------------------------
 

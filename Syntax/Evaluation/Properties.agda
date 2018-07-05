@@ -81,77 +81,77 @@ mutual
   nfEval (eRec e e₁ e₂ x) = nfRec (nfEval e) (nfEval e₁) (nfEval e₂) x
 
 mutual
-  ●-Tm : ∀{t s a n} → Tm n t → Tm n s → t ● s ↘ a → Tm n a
-  ●-Tm {n = n} tmt tms (●β (βrdx x x₂) x₁) =
-    liftTm n (Eval-Tm (sub-cover-lemma 0 0 x x₂) x₁)
-  ●-Tm tmt tms (●Ne x) = tmApp tmt tms
+  ●-Sz : ∀{t s a n} → Sz n t → Sz n s → t ● s ↘ a → Sz n a
+  ●-Sz {n = n} tmt tms (●β (βrdx x x₂) x₁) =
+    liftSz n (Eval-Sz (sub-cover-lemma 0 0 x x₂) x₁)
+  ●-Sz tmt tms (●Ne x) = tmApp tmt tms
 
-  rec-Tm : ∀{z s t a n} → Tm n z → Tm n s → Tm n t
-         → Rec z · s · t ↘ a → Tm n a
-  rec-Tm tmz tms tmt (rZ x) = tmz
-  rec-Tm tmz tms (tmSucc tmt) (rS x r x₁ x₂) =
-    ●-Tm (●-Tm tms tmt x₁) (rec-Tm tmz tms tmt r) x₂
-  rec-Tm tmz tms tmt (rNe x) = tmRec tmz tms tmt
+  rec-Sz : ∀{z s t a n} → Sz n z → Sz n s → Sz n t
+         → Rec z · s · t ↘ a → Sz n a
+  rec-Sz tmz tms tmt (rZ x) = tmz
+  rec-Sz tmz tms (tmSucc tmt) (rS x r x₁ x₂) =
+    ●-Sz (●-Sz tms tmt x₁) (rec-Sz tmz tms tmt r) x₂
+  rec-Sz tmz tms tmt (rNe x) = tmRec tmz tms tmt
 
-  Eval-Tm : ∀{t s n} → Tm n t → Eval t ↘ s → Tm n s
-  Eval-Tm tmFree eFree = tmFree
-  Eval-Tm (tmVar x₁) eBound = tmVar x₁
-  Eval-Tm (tmLam tm) (eLam e) = tmLam (Eval-Tm tm e)
-  Eval-Tm (tmApp tm tm₁) (eApp e e₁ x) = ●-Tm (Eval-Tm tm e) (Eval-Tm tm₁ e₁) x
-  Eval-Tm tmZero eZero = tmZero
-  Eval-Tm (tmSucc tm) (eSucc e) = tmSucc (Eval-Tm tm e)
-  Eval-Tm (tmRec tm tm₁ tm₂) (eRec e e₁ e₂ x) =
-    rec-Tm (Eval-Tm tm e) (Eval-Tm tm₁ e₁) (Eval-Tm tm₂ e₂) x
+  Eval-Sz : ∀{t s n} → Sz n t → Eval t ↘ s → Sz n s
+  Eval-Sz tmFree eFree = tmFree
+  Eval-Sz (tmVar x₁) eBound = tmVar x₁
+  Eval-Sz (tmLam tm) (eLam e) = tmLam (Eval-Sz tm e)
+  Eval-Sz (tmApp tm tm₁) (eApp e e₁ x) = ●-Sz (Eval-Sz tm e) (Eval-Sz tm₁ e₁) x
+  Eval-Sz tmZero eZero = tmZero
+  Eval-Sz (tmSucc tm) (eSucc e) = tmSucc (Eval-Sz tm e)
+  Eval-Sz (tmRec tm tm₁ tm₂) (eRec e e₁ e₂ x) =
+    rec-Sz (Eval-Sz tm e) (Eval-Sz tm₁ e₁) (Eval-Sz tm₂ e₂) x
 
 mutual
 
-  ●-¬Tm : ∀{t s a n} → t ● s ↘ a → ¬Tm n (t · s) → ¬Tm n a
-  ●-¬Tm (●β (βrdx x x₂) x₁) (¬tmApp₁ tm) =
-    ⊥-elim (¬Tm-lemma tm (tmLam (liftTm _ x)))
-  ●-¬Tm (●β (βrdx x x₃) x₁) (¬tmApp₂ x₂ tm) =
-    ⊥-elim (¬Tm-lemma tm (liftTm _ x₃))
-  ●-¬Tm (●Ne x) tm = tm
+  ●-¬Sz : ∀{t s a n} → t ● s ↘ a → ¬Sz n (t · s) → ¬Sz n a
+  ●-¬Sz (●β (βrdx x x₂) x₁) (¬tmApp₁ tm) =
+    ⊥-elim (¬Sz-lemma tm (tmLam (liftSz _ x)))
+  ●-¬Sz (●β (βrdx x x₃) x₁) (¬tmApp₂ x₂ tm) =
+    ⊥-elim (¬Sz-lemma tm (liftSz _ x₃))
+  ●-¬Sz (●Ne x) tm = tm
 
-  rec-¬Tm : ∀{z s t n a} → Rec z · s · t ↘ a → ¬Tm n (Rec z s t) → ¬Tm n a
-  rec-¬Tm (rZ (NrdxZ x x₁)) (¬tmRec₁ tm) = ⊥-elim (¬Tm-lemma tm (liftTm _ x))
-  rec-¬Tm (rZ (NrdxZ x x₁)) (¬tmRec₂ x₂ tm) = ⊥-elim (¬Tm-lemma tm (liftTm _ x₁))
-  rec-¬Tm (rZ (NrdxZ x x₁)) (¬tmRec₃ x₂ x₃ ())
-  rec-¬Tm (rS (NrdxS x x₃ x₄) r x₁ x₂) (¬tmRec₁ tm) =
-    ⊥-elim (¬Tm-lemma tm (liftTm _ x))
-  rec-¬Tm (rS (NrdxS x x₃ x₄) r x₁ x₂) (¬tmRec₂ x₅ tm) =
-    ⊥-elim (¬Tm-lemma tm (liftTm _ x₃))
-  rec-¬Tm (rS (NrdxS x x₃ x₄) r x₁ x₂) (¬tmRec₃ x₅ x₆ (¬tmSucc tm)) =
-    ⊥-elim (¬Tm-lemma tm (liftTm _ x₄))
-  rec-¬Tm (rNe x) tm = tm
+  rec-¬Sz : ∀{z s t n a} → Rec z · s · t ↘ a → ¬Sz n (Rec z s t) → ¬Sz n a
+  rec-¬Sz (rZ (NrdxZ x x₁)) (¬tmRec₁ tm) = ⊥-elim (¬Sz-lemma tm (liftSz _ x))
+  rec-¬Sz (rZ (NrdxZ x x₁)) (¬tmRec₂ x₂ tm) = ⊥-elim (¬Sz-lemma tm (liftSz _ x₁))
+  rec-¬Sz (rZ (NrdxZ x x₁)) (¬tmRec₃ x₂ x₃ ())
+  rec-¬Sz (rS (NrdxS x x₃ x₄) r x₁ x₂) (¬tmRec₁ tm) =
+    ⊥-elim (¬Sz-lemma tm (liftSz _ x))
+  rec-¬Sz (rS (NrdxS x x₃ x₄) r x₁ x₂) (¬tmRec₂ x₅ tm) =
+    ⊥-elim (¬Sz-lemma tm (liftSz _ x₃))
+  rec-¬Sz (rS (NrdxS x x₃ x₄) r x₁ x₂) (¬tmRec₃ x₅ x₆ (¬tmSucc tm)) =
+    ⊥-elim (¬Sz-lemma tm (liftSz _ x₄))
+  rec-¬Sz (rNe x) tm = tm
 
-  Eval-¬Tm : ∀{t a n} → Eval t ↘ a → ¬Tm n t → ¬Tm n a
-  Eval-¬Tm eBound tm = tm
-  Eval-¬Tm eFree tm = tm
-  Eval-¬Tm eZero tm = tm
-  Eval-¬Tm (eSucc e) (¬tmSucc tm) = ¬tmSucc (Eval-¬Tm e tm)
-  Eval-¬Tm (eLam e) (¬tmLam tm) = ¬tmLam (Eval-¬Tm e tm)
-  Eval-¬Tm (eApp e e₁ x) (¬tmApp₁ tm) = ●-¬Tm x (¬tmApp₁ (Eval-¬Tm e tm))
-  Eval-¬Tm (eApp e e₁ x) (¬tmApp₂ x₁ tm) = ●-¬Tm x (inj-tmApp₂ (Eval-¬Tm e₁ tm))
-  Eval-¬Tm (eRec e e₁ e₂ x) (¬tmRec₁ tm) = rec-¬Tm x (¬tmRec₁ (Eval-¬Tm e tm))
-  Eval-¬Tm (eRec e e₁ e₂ x) (¬tmRec₂ x₁ tm) =
-    rec-¬Tm x (inj-tmRec₂ (Eval-¬Tm e₁ tm))
-  Eval-¬Tm (eRec e e₁ e₂ x) (¬tmRec₃ x₁ x₂ tm) =
-    rec-¬Tm x (inj-tmRec₃ (Eval-¬Tm e₂ tm))
+  Eval-¬Sz : ∀{t a n} → Eval t ↘ a → ¬Sz n t → ¬Sz n a
+  Eval-¬Sz eBound tm = tm
+  Eval-¬Sz eFree tm = tm
+  Eval-¬Sz eZero tm = tm
+  Eval-¬Sz (eSucc e) (¬tmSucc tm) = ¬tmSucc (Eval-¬Sz e tm)
+  Eval-¬Sz (eLam e) (¬tmLam tm) = ¬tmLam (Eval-¬Sz e tm)
+  Eval-¬Sz (eApp e e₁ x) (¬tmApp₁ tm) = ●-¬Sz x (¬tmApp₁ (Eval-¬Sz e tm))
+  Eval-¬Sz (eApp e e₁ x) (¬tmApp₂ x₁ tm) = ●-¬Sz x (inj-tmApp₂ (Eval-¬Sz e₁ tm))
+  Eval-¬Sz (eRec e e₁ e₂ x) (¬tmRec₁ tm) = rec-¬Sz x (¬tmRec₁ (Eval-¬Sz e tm))
+  Eval-¬Sz (eRec e e₁ e₂ x) (¬tmRec₂ x₁ tm) =
+    rec-¬Sz x (inj-tmRec₂ (Eval-¬Sz e₁ tm))
+  Eval-¬Sz (eRec e e₁ e₂ x) (¬tmRec₃ x₁ x₂ tm) =
+    rec-¬Sz x (inj-tmRec₃ (Eval-¬Sz e₂ tm))
 
-Eval-Tm' : ∀{t n a} → Eval t ↘ a → Tm n a → Tm n t
-Eval-Tm' {t} {n} e tm with decTm n t
-Eval-Tm' e tm | inj₁ x = x
-Eval-Tm' e tm | inj₂ y = ⊥-elim (¬Tm-lemma (Eval-¬Tm e y) tm)
+Eval-Sz' : ∀{t n a} → Eval t ↘ a → Sz n a → Sz n t
+Eval-Sz' {t} {n} e tm with decSz n t
+Eval-Sz' e tm | inj₁ x = x
+Eval-Sz' e tm | inj₂ y = ⊥-elim (¬Sz-lemma (Eval-¬Sz e y) tm)
 
-Eval-¬Tm' : ∀{t a n} → Eval t ↘ a → ¬Tm n a → ¬Tm n t
-Eval-¬Tm' e ¬tm = ¬Tm-lemma' λ x → ¬Tm-lemma ¬tm (Eval-Tm x e)
+Eval-¬Sz' : ∀{t a n} → Eval t ↘ a → ¬Sz n a → ¬Sz n t
+Eval-¬Sz' e ¬tm = ¬Sz-lemma' λ x → ¬Sz-lemma ¬tm (Eval-Sz x e)
 
 mutual
 
   ●wk : ∀{t s a w} → t ● s ↘ a → wk t w ● wk s w ↘ wk a w
   ●wk {w = w} (●β (βrdx tmt tms) y)
     rewrite null-wk {w = w} tmt | null-wk {w = w} tms
-          | null-wk {w = w} (Eval-Tm (sub-cover-lemma 0 0 tmt tms) y) =
+          | null-wk {w = w} (Eval-Sz (sub-cover-lemma 0 0 tmt tms) y) =
     ●β (βrdx tmt tms) y
   ●wk {w = w} (●Ne x) = ●Ne (neWkLemma x)
 
@@ -164,7 +164,7 @@ mutual
     rewrite null-wk {w = w} tmz | null-wk {w = w} tms | null-wk {w = w} tmn =
             rS (NrdxS tmz tms tmn) r x₃ goal
     where
-      aux = ●-Tm (●-Tm tms tmn x₃) (rec-Tm tmz tms tmn r) x₄
+      aux = ●-Sz (●-Sz tms tmn x₃) (rec-Sz tmz tms tmn r) x₄
       goal : _ ● _ ↘ wk a w
       goal rewrite null-wk {w = w} aux = x₄
   recwk (rNe x) = rNe (neWkLemma x)

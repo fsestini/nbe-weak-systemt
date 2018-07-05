@@ -131,8 +131,8 @@ appLemma {Θ} {Γ} {A} {B} (=>-®-Lam {t' = t'} {d = d} nfd conv h1) sa (●β r
     (∼trans (∼compApp conv (∼refl (der sa)))
       (≡to∼R (eq-sub (consˢ (symmˢ {Id · Id} {Id} (sub-id-L {Id}))) t')
         (~⟶ (⟶β
-          (⊢shrink (der h2) (sameTm∼RL (convert-® h2) (β-Redex-Tm-Lam-t rdx)))
-          (⊢shrink (der sa) (sameTm∼RL (convert-® sa) (β-Redex-Tm-s rdx)))))))
+          (⊢shrink (der h2) (sameSz∼RL (convert-® h2) (β-Redex-Sz-Lam-t rdx)))
+          (⊢shrink (der sa) (sameSz∼RL (convert-® sa) (β-Redex-Sz-s rdx)))))))
     (h1 ⊢Id sa (≡Eval (eq-sub (consˢ (symmˢ {Id · Id} {Id}
       (sub-id-L {Id}))) d) refl sb))
   where h2 = body-rel nfd h1
@@ -147,17 +147,17 @@ rekk relz rels reln (rZ x) =
     (∼trans
       (∼compRec (∼refl (der relz)) (∼refl (der rels)) (convert-® reln))
       (~⟶ (⟶recZ
-        (⊢shrink (der relz) (sameTm∼RL (convert-® relz) (N-Redex-Tm-z x)))
-        (⊢shrink (der rels) (sameTm∼RL (convert-® rels) (N-Redex-Tm-s x))))))
+        (⊢shrink (der relz) (sameSz∼RL (convert-® relz) (N-Redex-Sz-z x)))
+        (⊢shrink (der rels) (sameSz∼RL (convert-® rels) (N-Redex-Sz-s x))))))
         relz
 rekk relz rels relsn@(N-®-S x₄ reln) (rS x r x₁ x₂) =
   ∼preservation
     (∼trans (∼compRec (∼refl (der relz)) (∼refl (der rels)) x₄)
       (~⟶ (⟶recS
-        (⊢shrink (der relz) (sameTm∼RL (convert-® relz) (N-Redex-Tm-z x)))
-        (⊢shrink (der rels) (sameTm∼RL (convert-® rels) (N-Redex-Tm-s x)))
-        (⊢shrink (der reln) (sameTm∼RL (convert-® reln)
-          (tmSuccLemma (N-Redex-Tm-t x)))))))
+        (⊢shrink (der relz) (sameSz∼RL (convert-® relz) (N-Redex-Sz-z x)))
+        (⊢shrink (der rels) (sameSz∼RL (convert-® rels) (N-Redex-Sz-s x)))
+        (⊢shrink (der reln) (sameSz∼RL (convert-® reln)
+          (tmSuccLemma (N-Redex-Sz-t x)))))))
     (appLemma (appLemma rels reln x₁) (rekk relz rels reln r) x₂)
 rekk relz rels (N-®-Ne () x₄) (rS x r x₁ x₂)
 rekk relz rels reln (rNe x) =

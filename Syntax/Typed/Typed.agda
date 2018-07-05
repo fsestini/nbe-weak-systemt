@@ -52,13 +52,13 @@ model M (rec zd sd td) = M-rec M (model M zd) (model M sd) (model M td)
     → Θ' ∷ Γ' ⊢ t' ∶ A' → Θ ∷ Γ ⊢ t ∶ A
 ≡tm refl refl refl refl tm = tm
 
-tyClosed : ∀{Θ Γ t A} → Θ ∷ Γ ⊢ t ∶ A → Tm (clen Γ) t
+tyClosed : ∀{Θ Γ t A} → Θ ∷ Γ ⊢ t ∶ A → Sz (clen Γ) t
 tyClosed = model record
-  { _∷_⊧_∶_ = λ Θ Γ t A → Tm (clen Γ) t ; M-free = λ _ → tmFree
+  { _∷_⊧_∶_ = λ Θ Γ t A → Sz (clen Γ) t ; M-free = λ _ → tmFree
   ; M-var = λ { {_} {◇} () ; {_} {_ # _} x → tmVar (inv-≤ (↦lemma x)) }
   ; M-lam = tmLam ; M-● = tmApp ; M-zZ = tmZero ; M-sS = tmSucc ; M-rec = tmRec }
 
-⊢shrink : ∀{Θ Δ Γ A t} → Θ ∷ Δ ++ Γ ⊢ t ∶ A → Tm (clen Γ) t
+⊢shrink : ∀{Θ Δ Γ A t} → Θ ∷ Δ ++ Γ ⊢ t ∶ A → Sz (clen Γ) t
         → Θ ∷ Γ ⊢ t ∶ A
 ⊢shrink (free x) tm = free x
 ⊢shrink {Γ = ◇} (var x) ()
@@ -71,9 +71,9 @@ tyClosed = model record
 ⊢shrink (rec t t₁ t₂) (tmRec tm tm₁ tm₂) =
   rec (⊢shrink t tm) (⊢shrink t₁ tm₁) (⊢shrink t₂ tm₂)
 
-metaTyClosed : ∀{Θ Γ t A} → Θ ∷ Γ ⊢ t ∶ A → Tmₗ (clen Θ) t
+metaTyClosed : ∀{Θ Γ t A} → Θ ∷ Γ ⊢ t ∶ A → Szₗ (clen Θ) t
 metaTyClosed = model record
-  { _∷_⊧_∶_ = λ Θ _ t _ → Tmₗ (clen Θ) t
+  { _∷_⊧_∶_ = λ Θ _ t _ → Szₗ (clen Θ) t
   ; M-free = λ { here → tmlFree (≤refl _) ; (there x) → tmlFree (↦ₗlemma x) }
   ; M-var = λ _ → tmlVar ; M-lam = tmlLam ; M-● = tmlApp ; M-zZ = tmlZero
   ; M-sS = tmlSucc ; M-rec = tmlRec }

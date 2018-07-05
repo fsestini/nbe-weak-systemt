@@ -20,9 +20,9 @@ NeAppTransferLemma : ∀{t t' t'' s s' s'' σ}
 NeAppTransferLemma et es et' es' (neApp ne x x₁ x₂) = 
   inj-neApp (NeTransport et et' ne) (nfEval es')
 NeAppTransferLemma et es et' es' (neApp₁ x x₁ x₂) = 
-  neApp₁ (nfEval et') (nfEval es') (¬Tm-sub-lemma 0 (Eval-¬Tm' et x₂))
+  neApp₁ (nfEval et') (nfEval es') (¬Sz-sub-lemma 0 (Eval-¬Sz' et x₂))
 NeAppTransferLemma et es et' es' (neApp₂ x x₁ x₂ x₃) = 
-  inj-neApp₂ (nfEval et') (nfEval es') (¬Tm-sub-lemma 0 (Eval-¬Tm' es x₃))
+  inj-neApp₂ (nfEval et') (nfEval es') (¬Sz-sub-lemma 0 (Eval-¬Sz' es x₃))
 
 NeRecTransferLemma : ∀{z z' z'' s s' s'' t t' t'' σ}
   → Eval sub z'' σ ↘ z' → Eval sub s'' σ ↘ s' → Eval sub t'' σ ↘ t'
@@ -33,10 +33,10 @@ NeRecTransferLemma ez es et ez' es' et' (neRec x x₁ ne x₂ x₃ x₄) =
   inj-neRec (nfEval ez') (nfEval es') (NeTransport et et' ne)
 NeRecTransferLemma ez es et ez' es' et' (neRec₁ x x₁ x₂ x₃) = 
   neRec₁ (nfEval ez') (nfEval es') (nfEval et') 
-    (¬Tm-sub-lemma 0 (Eval-¬Tm' ez x₃))
+    (¬Sz-sub-lemma 0 (Eval-¬Sz' ez x₃))
 NeRecTransferLemma ez es et ez' es' et' (neRec₂ x x₁ x₂ x₃ x₄) = 
   inj-neRec₂ (nfEval ez') (nfEval es') (nfEval et') 
-    (¬Tm-sub-lemma 0 (Eval-¬Tm' es x₄))
+    (¬Sz-sub-lemma 0 (Eval-¬Sz' es x₄))
 NeRecTransferLemma ez es et ez' es' et' (neRec₃ x x₁ x₂ x₃ x₄ x₅) = 
   inj-neRec₃ (nfEval ez') (nfEval es') (nfEval et') 
-    (¬Tm-sub-lemma 0 (Eval-¬Tm' et x₅))
+    (¬Sz-sub-lemma 0 (Eval-¬Sz' et x₅))

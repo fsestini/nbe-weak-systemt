@@ -236,8 +236,8 @@ singleton-comp {σ} {s} t =
   trans (sub-comp {sh σ} {Id , s} t) (eq-sub (consˢ {s = s} (sub-id-L {σ})) t)
 
 sub-var-cover-lemma : ∀{s} n m x
-                    → x ≤ m + n → Tm n s
-                    → Tm (m + n) (sub-var x (shift m (Id , s)))
+                    → x ≤ m + n → Sz n s
+                    → Sz (m + n) (sub-var x (shift m (Id , s)))
 sub-var-cover-lemma n zero zero p tm = tm
 sub-var-cover-lemma .(suc _) zero (suc x) (s≤s p) tm = tmVar p
 sub-var-cover-lemma n (suc m) zero p tm = tmVar z≤n
@@ -245,8 +245,8 @@ sub-var-cover-lemma n (suc m) (suc x) (s≤s p) tm =
   tm-wk-lemma (m + n) 0 1 (sub-var-cover-lemma n m x p tm)
 
 sub-cover-lemma : ∀{t s} n m
-                → Tm (suc (m + n)) t → Tm n s
-                → Tm (m + n) (sub t (shift m (Id , s)))
+                → Sz (suc (m + n)) t → Sz n s
+                → Sz (m + n) (sub t (shift m (Id , s)))
 sub-cover-lemma n m tmFree tms = tmFree
 sub-cover-lemma n m (tmVar x₁) tms = sub-var-cover-lemma n m _ x₁ tms
 sub-cover-lemma n m (tmLam tmt₁) tms =
@@ -265,7 +265,7 @@ null-sub-var (suc n) zero p = refl
 null-sub-var {σ} (suc n) (suc x) (s≤s p)
   rewrite null-sub-var {σ} n x p = refl
 
-null-sub : ∀{σ t n} → Tm n t → sub t (shift n σ) ≡ t
+null-sub : ∀{σ t n} → Sz n t → sub t (shift n σ) ≡ t
 null-sub tmFree = refl
 null-sub (tmVar x) = null-sub-var _ _ x
 null-sub (tmLam tm) = cong Lam (null-sub tm)
@@ -275,36 +275,36 @@ null-sub (tmRec tm tm₁ tm₂) =
 null-sub tmZero = refl
 null-sub (tmSucc tm) = cong Succ (null-sub tm)
 
-¬Tm-sub-var-lemma : ∀{σ} n m x
-                  → ¬Tm (m + n) (wk (sub-var x (shift n σ)) (up m Id))
-                  → ¬Tm (m + n) (Bound (x + m))
-¬Tm-sub-var-lemma zero m zero tm rewrite plus-0 m = ¬tmVar (≤refl m)
-¬Tm-sub-var-lemma zero m (suc x) tm rewrite plus-0 m = ¬tmVar (aux x m)
+¬Sz-sub-var-lemma : ∀{σ} n m x
+                  → ¬Sz (m + n) (wk (sub-var x (shift n σ)) (up m Id))
+                  → ¬Sz (m + n) (Bound (x + m))
+¬Sz-sub-var-lemma zero m zero tm rewrite plus-0 m = ¬tmVar (≤refl m)
+¬Sz-sub-var-lemma zero m (suc x) tm rewrite plus-0 m = ¬tmVar (aux x m)
   where
     aux : ∀ x m → suc (x + m) ≥ m
     aux x zero = z≤n
     aux x (suc m) rewrite plus-succ x m = s≤s (aux x m)
-¬Tm-sub-var-lemma (suc n) m zero (¬tmVar x) rewrite wk-var-ups 0 m = ¬tmVar x
-¬Tm-sub-var-lemma {σ} (suc n) m (suc x) tm =
-  ¬Tm≡ (cong Bound (plus-succ x m)) (sym (plus-succ m n))
-    (¬Tm-sub-var-lemma {σ} n (suc m) x (¬Tm≡ aux (plus-succ m n) tm))
+¬Sz-sub-var-lemma (suc n) m zero (¬tmVar x) rewrite wk-var-ups 0 m = ¬tmVar x
+¬Sz-sub-var-lemma {σ} (suc n) m (suc x) tm =
+  ¬Sz≡ (cong Bound (plus-succ x m)) (sym (plus-succ m n))
+    (¬Sz-sub-var-lemma {σ} n (suc m) x (¬Sz≡ aux (plus-succ m n) tm))
   where
     aux = trans (wk-comp (Up Id) (up m Id) (sub-var x (shift n σ)))
                 (eq-wk {Up Id ·ʷ up m Id} {up (suc m) Id} (ups-comp 1 m) _)
 
-¬Tm-sub-lemma : ∀{t σ} n → ¬Tm n (sub t (shift n σ)) → ¬Tm n t
-¬Tm-sub-lemma {Free x} n tm = tm
-¬Tm-sub-lemma {Bound x} n tm =
-  ¬Tm≡ (cong Bound (plus-0 x)) refl
-    (¬Tm-sub-var-lemma n 0 x (¬Tm≡ (sym (id-wk 0 _)) refl tm))
-¬Tm-sub-lemma {Lam t} n (¬tmLam tm) = ¬tmLam (¬Tm-sub-lemma (suc n) tm)
-¬Tm-sub-lemma {t · s} n (¬tmApp₁ tm) = ¬tmApp₁ (¬Tm-sub-lemma n tm)
-¬Tm-sub-lemma {t · s} n (¬tmApp₂ x tm) = inj-tmApp₂ (¬Tm-sub-lemma n tm)
-¬Tm-sub-lemma {Zero} n tm = tm
-¬Tm-sub-lemma {Succ t} n (¬tmSucc tm) = ¬tmSucc (¬Tm-sub-lemma n tm)
-¬Tm-sub-lemma {Rec z s t} n (¬tmRec₁ tm) = ¬tmRec₁ (¬Tm-sub-lemma n tm)
-¬Tm-sub-lemma {Rec z s t} n (¬tmRec₂ x tm) = inj-tmRec₂ (¬Tm-sub-lemma n tm)
-¬Tm-sub-lemma {Rec z s t} n (¬tmRec₃ x x₁ tm) = inj-tmRec₃ (¬Tm-sub-lemma n tm)
+¬Sz-sub-lemma : ∀{t σ} n → ¬Sz n (sub t (shift n σ)) → ¬Sz n t
+¬Sz-sub-lemma {Free x} n tm = tm
+¬Sz-sub-lemma {Bound x} n tm =
+  ¬Sz≡ (cong Bound (plus-0 x)) refl
+    (¬Sz-sub-var-lemma n 0 x (¬Sz≡ (sym (id-wk 0 _)) refl tm))
+¬Sz-sub-lemma {Lam t} n (¬tmLam tm) = ¬tmLam (¬Sz-sub-lemma (suc n) tm)
+¬Sz-sub-lemma {t · s} n (¬tmApp₁ tm) = ¬tmApp₁ (¬Sz-sub-lemma n tm)
+¬Sz-sub-lemma {t · s} n (¬tmApp₂ x tm) = inj-tmApp₂ (¬Sz-sub-lemma n tm)
+¬Sz-sub-lemma {Zero} n tm = tm
+¬Sz-sub-lemma {Succ t} n (¬tmSucc tm) = ¬tmSucc (¬Sz-sub-lemma n tm)
+¬Sz-sub-lemma {Rec z s t} n (¬tmRec₁ tm) = ¬tmRec₁ (¬Sz-sub-lemma n tm)
+¬Sz-sub-lemma {Rec z s t} n (¬tmRec₂ x tm) = inj-tmRec₂ (¬Sz-sub-lemma n tm)
+¬Sz-sub-lemma {Rec z s t} n (¬tmRec₃ x x₁ tm) = inj-tmRec₃ (¬Sz-sub-lemma n tm)
 
 idsub : (Γ : Ctxt) → Subst
 idsub Γ = shift (clen Γ) Id
